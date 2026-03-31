@@ -1,60 +1,130 @@
 # Spring HTTP Camunda Client
 
-Minimal Spring Boot 4 example showing how to use `spring-boot-starter-restclient` to call a Camunda 8 REST endpoint with bearer tokens generated through OAuth client credentials.
+A Spring Boot client application that calls Camunda 8 SaaS REST endpoints using OAuth client credentials.
 
-## What this project does
+---
 
-- configures a Spring `RestClient` for Camunda API calls
-- loads Camunda settings from `camunda.*` properties
-- obtains and caches OAuth access tokens with a `TokenProvider`
-- exposes a local endpoint at `GET /api/camunda/topology`
-- forwards that request to the configured Camunda `/v2/topology` endpoint
+## Table of Contents
 
-## Main classes
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Get Required Values from Camunda 8 SaaS](#get-required-values-from-camunda-8-saas)
+  - [Network Access Requirements](#network-access-requirements)
+  - [Setting Environment Variables](#setting-environment-variables)
+    - [macOS and Linux](#macos-and-linux)
+    - [Windows PowerShell](#windows-powershell)
+    - [Windows Command Prompt](#windows-command-prompt)
+  - [Using direnv (Alternative)](#using-direnv-alternative)
+- [Request Flow](#request-flow)
+- [Running the Application](#running-the-application)
+- [API Endpoint](#api-endpoint)
+- [Running Tests](#running-tests)
+- [Building a JAR](#building-a-jar)
+- [Troubleshooting](#troubleshooting)
 
-- `CamundaClientConfig` wires the `RestClient` and token provider beans
-- `CamundaClientProperties` is a compact record-based `@ConfigurationProperties` model
-- `TokenProvider` is the small abstraction for retrieving an access token
-- `ClientCredentialsTokenProvider` fetches and caches tokens from the OAuth token endpoint
-- `CamundaController` exposes the local `/api/camunda/topology` endpoint
+---
+
+## Overview
+
+This project provides a minimal, production-style example of:
+
+- configuring a Spring `RestClient` for Camunda API calls
+- loading Camunda settings from `camunda.*` properties
+- obtaining and caching OAuth access tokens with a `TokenProvider`
+- exposing `GET /api/camunda/topology` locally
+- forwarding requests to `{camunda.base-url}{camunda.api-path}/topology`
+
+---
+
+## Tech Stack
+
+| Technology | Version |
+| --- | --- |
+| Java | 25 |
+| Spring Boot | 4.0.4 |
+| Spring Web MVC | via `spring-boot-starter-webmvc` |
+| Spring RestClient | via `spring-boot-starter-restclient` |
+| Bean Validation | via `spring-boot-starter-validation` |
+| Maven | 3.x (via wrapper `mvnw`) |
+
+---
+
+## Project Structure
+
+```text
+src/
+├── main/
+│   ├── java/org/camunda/consulting/httpclient/
+│   │   ├── CamundaClientApplication.java        # Spring Boot entry point
+│   │   ├── CamundaClientConfig.java             # RestClient and token provider wiring
+│   │   ├── CamundaClientProperties.java         # Configuration properties + validation
+│   │   ├── TokenProvider.java                   # Token abstraction
+│   │   ├── ClientCredentialsTokenProvider.java  # OAuth client credentials token flow
+│   │   └── CamundaController.java               # GET /api/camunda/topology endpoint
+│   └── resources/
+│       └── application.yaml                     # Env-backed configuration defaults
+└── test/
+    └── java/org/camunda/consulting/httpclient/
+        ├── CamundaClientApplicationTests.java
+        ├── CamundaControllerTest.java
+        ├── CamundaRestClientTest.java
+        ├── CamundaTestSupport.java
+        └── ClientCredentialsTokenProviderTest.java
+```
+
+---
+
+## Prerequisites
+
+- Java 25 (or compatible with this project)
+- Maven 3.x (or use `./mvnw`)
+- Camunda 8 SaaS account with client credentials
+
+---
 
 ## Configuration
 
-Configuration is defined in `src/main/resources/application.yaml` and can be overridden with environment variables.
+Configuration is defined in `src/main/resources/application.yaml` and is environment-variable driven.
 
-| Property | Environment variable | Description |
-| --- | --- | --- |
-| `camunda.base-url` | `CAMUNDA_BASE_URL` | Camunda cluster base URL, for example `https://your-camunda-endpoint` (required, must not be blank) |
-| `camunda.api-path` | `CAMUNDA_API_PATH` | REST API path, defaults to `/v2` |
-| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | OAuth token endpoint, defaults to `https://login.cloud.camunda.io/oauth/token` |
-| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | OAuth client id (required, must not be blank) |
-| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | OAuth client secret (required, must not be blank) |
-| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | Audience for OAuth token request, defaults to `zeebe.camunda.io` |
-| `camunda.auth.scope` | `CAMUNDA_SCOPE` | OAuth scope, defaults to `Zeebe`; allowed values: `Zeebe`, `Tasklist`, `Operate` |
-| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | Token refresh buffer, defaults to `PT30S` |
+### Environment Variables
 
-`camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` must be provided and non-blank.
+| Property | Environment variable | Required | Default | Notes |
+| --- | --- | --- | --- | --- |
+| `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes | None | Must not be blank |
+| `camunda.api-path` | `CAMUNDA_API_PATH` | No | `/v2` | API prefix |
+| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | No | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint |
+| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes | None | Must not be blank |
+| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes | None | Must not be blank |
+| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No | `zeebe.camunda.io` | OAuth audience |
+| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate` |
+| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No | `PT30S` | ISO-8601 duration |
 
-### Get required values from Camunda 8 SaaS
+`camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` are validated as non-blank at startup.
 
-You can get `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` from the Camunda Console:
+### Get Required Values from Camunda 8 SaaS
 
-1. Sign in to the Camunda Console for your organization.
-2. Open your cluster and copy the cluster REST endpoint host.
-   - Use that as `CAMUNDA_BASE_URL` (for example `https://<cluster-region>.zeebe.camunda.io/<cluster-id>`).
-3. Open **API / Client Credentials** (wording can vary slightly by Console version).
-4. Create a client credential if you do not already have one.
-5. Copy the generated values:
-   - **Client ID** -> `CAMUNDA_CLIENT_ID`
-   - **Client Secret** -> `CAMUNDA_CLIENT_SECRET`
+1. Sign in to Camunda Console.
+2. Open your cluster and copy the REST endpoint host for `CAMUNDA_BASE_URL`.
+3. Open **API / Client Credentials**.
+4. Create or open an M2M credential.
+5. Copy:
+   - `CAMUNDA_CLIENT_ID`
+   - `CAMUNDA_CLIENT_SECRET`
 
-Keep `CAMUNDA_CLIENT_SECRET` secure. Camunda usually only shows it once when created.
+### Network Access Requirements
 
-## Environment variable setup
+Ensure outbound access from your environment to:
 
-### macOS and Linux
+- your configured `CAMUNDA_BASE_URL`
+- `https://login.cloud.camunda.io/oauth/token`
 
-For the current terminal session:
+### Setting Environment Variables
+
+#### macOS and Linux
 
 ```zsh
 export CAMUNDA_BASE_URL="https://your-camunda-endpoint"
@@ -67,14 +137,9 @@ export CAMUNDA_SCOPE="Zeebe"
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
-To keep them across sessions, add the same `export ...` lines to your shell profile, for example:
+Persist by adding the same exports to `~/.zshrc`, `~/.bashrc`, or `~/.profile`.
 
-- `~/.zshrc` on macOS when using `zsh`
-- `~/.bashrc` or `~/.profile` on Linux
-
-### Windows PowerShell
-
-For the current PowerShell session:
+#### Windows PowerShell
 
 ```powershell
 $env:CAMUNDA_BASE_URL="https://your-camunda-endpoint"
@@ -87,7 +152,7 @@ $env:CAMUNDA_SCOPE="Zeebe"
 $env:CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
-To persist them for future sessions, use `setx`:
+For persistent user variables:
 
 ```powershell
 setx CAMUNDA_BASE_URL "https://your-camunda-endpoint"
@@ -100,11 +165,7 @@ setx CAMUNDA_SCOPE "Zeebe"
 setx CAMUNDA_TOKEN_REFRESH_SKEW "PT30S"
 ```
 
-Open a new PowerShell window after using `setx`.
-
-### Windows Command Prompt
-
-For the current `cmd.exe` session:
+#### Windows Command Prompt
 
 ```bat
 set CAMUNDA_BASE_URL=https://your-camunda-endpoint
@@ -117,22 +178,18 @@ set CAMUNDA_SCOPE=Zeebe
 set CAMUNDA_TOKEN_REFRESH_SKEW=PT30S
 ```
 
-### Alternate option: direnv
+### Using direnv (Alternative)
 
-This project also includes a single `.envrc` file with the same `CAMUNDA_*` variables used by `application.yaml`.
-
-The committed `.envrc` keeps `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` empty on purpose (you must set them), and provides defaults for `CAMUNDA_API_PATH`, `CAMUNDA_TOKEN_URL`, `CAMUNDA_AUDIENCE`, `CAMUNDA_SCOPE`, and `CAMUNDA_TOKEN_REFRESH_SKEW`.
-
-To load them with `direnv`:
+If you want `direnv` to inject variables, create `.envrc` in the project root and define `CAMUNDA_*` values there.
 
 ```zsh
-cd "/Users/ajit.kadari/github-local/Spring-Http-Camunda-Client"
+cd /path/to/your/project
 direnv allow
 ```
 
-You can then edit `.envrc` directly with your Camunda values.
+Run `direnv allow` again after modifying `.envrc`.
 
-## Example `.envrc` values
+Example `.envrc`:
 
 ```sh
 export CAMUNDA_BASE_URL="https://your-camunda-endpoint"
@@ -145,40 +202,67 @@ export CAMUNDA_SCOPE="Zeebe"
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
-## Request flow
+---
 
-1. Call `GET /api/camunda/topology` on this application.
-2. `CamundaController` invokes the configured Camunda API `RestClient`.
-3. A request interceptor asks `TokenProvider` for an access token.
+## Request Flow
+
+1. Call `GET /api/camunda/topology`.
+2. `CamundaController` invokes the Camunda `RestClient`.
+3. The request interceptor asks `TokenProvider` for a token.
 4. `ClientCredentialsTokenProvider` fetches or reuses a cached token.
-5. The request is sent to `{camunda.base-url}{camunda.api-path}/topology` with `Authorization: Bearer ...`.
+5. Request is sent with `Authorization: Bearer <token>`.
 
-## Project structure
+---
 
-- `src/main/java/org/camunda/consulting/httpclient/CamundaClientApplication.java`
-- `src/main/java/org/camunda/consulting/httpclient/CamundaClientConfig.java`
-- `src/main/java/org/camunda/consulting/httpclient/CamundaClientProperties.java`
-- `src/main/java/org/camunda/consulting/httpclient/TokenProvider.java`
-- `src/main/java/org/camunda/consulting/httpclient/ClientCredentialsTokenProvider.java`
-- `src/main/java/org/camunda/consulting/httpclient/CamundaController.java`
-
-## Run
+## Running the Application
 
 ```zsh
 ./mvnw spring-boot:run
 ```
 
-Then call:
+---
+
+## API Endpoint
+
+Local endpoint:
+
+- `GET http://localhost:8080/api/camunda/topology`
+
+Quick check:
 
 ```zsh
 curl http://localhost:8080/api/camunda/topology
 ```
 
-## Test
+---
+
+## Running Tests
 
 ```zsh
 ./mvnw test
 ```
+
+---
+
+## Building a JAR
+
+```zsh
+./mvnw clean package
+```
+
+---
+
+## Troubleshooting
+
+- `camunda.auth.client-id must be configured` or `camunda.auth.client-secret must be configured`
+  - Set non-empty values for `CAMUNDA_CLIENT_ID` and `CAMUNDA_CLIENT_SECRET`.
+- `camunda.auth.scope` validation fails
+  - Use one of: `Zeebe`, `Tasklist`, `Operate`.
+- Startup binding failures for required properties
+  - Ensure `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` are set and non-blank.
+- OAuth/token request failures
+  - Verify `CAMUNDA_TOKEN_URL`, `CAMUNDA_AUDIENCE`, and network connectivity to Camunda SaaS endpoints.
+
 
 
 
