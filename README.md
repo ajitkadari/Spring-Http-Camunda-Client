@@ -27,11 +27,13 @@ Configuration is defined in `src/main/resources/application.yaml` and can be ove
 | `camunda.base-url` | `CAMUNDA_BASE_URL` | Camunda cluster base URL, for example `https://your-camunda-endpoint` |
 | `camunda.api-path` | `CAMUNDA_API_PATH` | REST API path, defaults to `/v2` |
 | `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | OAuth token endpoint, defaults to `https://login.cloud.camunda.io/oauth/token` |
-| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | OAuth client id |
-| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | OAuth client secret |
+| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | OAuth client id (required, must not be blank) |
+| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | OAuth client secret (required, must not be blank) |
 | `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | Audience for OAuth token request, defaults to `zeebe.camunda.io` |
-| `camunda.auth.scope` | `CAMUNDA_SCOPE` | Optional OAuth scope |
+| `camunda.auth.scope` | `CAMUNDA_SCOPE` | OAuth scope, defaults to `Zeebe`; allowed values: `Zeebe`, `Tasklist`, `Operate` |
 | `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | Token refresh buffer, defaults to `PT30S` |
+
+`camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` must be provided and non-blank.
 
 ### Get required values from Camunda 8 SaaS
 
@@ -61,7 +63,7 @@ export CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 export CAMUNDA_CLIENT_ID="your-client-id"
 export CAMUNDA_CLIENT_SECRET="your-client-secret"
 export CAMUNDA_AUDIENCE="zeebe.camunda.io"
-export CAMUNDA_SCOPE=""
+export CAMUNDA_SCOPE="Zeebe"
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
@@ -81,7 +83,7 @@ $env:CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 $env:CAMUNDA_CLIENT_ID="your-client-id"
 $env:CAMUNDA_CLIENT_SECRET="your-client-secret"
 $env:CAMUNDA_AUDIENCE="zeebe.camunda.io"
-$env:CAMUNDA_SCOPE=""
+$env:CAMUNDA_SCOPE="Zeebe"
 $env:CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
@@ -94,7 +96,7 @@ setx CAMUNDA_TOKEN_URL "https://login.cloud.camunda.io/oauth/token"
 setx CAMUNDA_CLIENT_ID "your-client-id"
 setx CAMUNDA_CLIENT_SECRET "your-client-secret"
 setx CAMUNDA_AUDIENCE "zeebe.camunda.io"
-setx CAMUNDA_SCOPE ""
+setx CAMUNDA_SCOPE "Zeebe"
 setx CAMUNDA_TOKEN_REFRESH_SKEW "PT30S"
 ```
 
@@ -111,7 +113,7 @@ set CAMUNDA_TOKEN_URL=https://login.cloud.camunda.io/oauth/token
 set CAMUNDA_CLIENT_ID=your-client-id
 set CAMUNDA_CLIENT_SECRET=your-client-secret
 set CAMUNDA_AUDIENCE=zeebe.camunda.io
-set CAMUNDA_SCOPE=
+set CAMUNDA_SCOPE=Zeebe
 set CAMUNDA_TOKEN_REFRESH_SKEW=PT30S
 ```
 
@@ -137,7 +139,7 @@ export CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 export CAMUNDA_CLIENT_ID="your-client-id"
 export CAMUNDA_CLIENT_SECRET="your-client-secret"
 export CAMUNDA_AUDIENCE="zeebe.camunda.io"
-export CAMUNDA_SCOPE=""
+export CAMUNDA_SCOPE="Zeebe"
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
 
@@ -151,7 +153,7 @@ export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 
 ## Project structure
 
-- `src/main/java/org/camunda/consulting/httpclient/SpringHttpCamundaClientApplication.java`
+- `src/main/java/org/camunda/consulting/httpclient/CamundaClientApplication.java`
 - `src/main/java/org/camunda/consulting/httpclient/CamundaClientConfig.java`
 - `src/main/java/org/camunda/consulting/httpclient/CamundaClientProperties.java`
 - `src/main/java/org/camunda/consulting/httpclient/TokenProvider.java`
