@@ -33,6 +33,21 @@ Configuration is defined in `src/main/resources/application.yaml` and can be ove
 | `camunda.auth.scope` | `CAMUNDA_SCOPE` | Optional OAuth scope |
 | `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | Token refresh buffer, defaults to `PT30S` |
 
+### Get required values from Camunda 8 SaaS
+
+You can get `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` from the Camunda Console:
+
+1. Sign in to the Camunda Console for your organization.
+2. Open your cluster and copy the cluster REST endpoint host.
+   - Use that as `CAMUNDA_BASE_URL` (for example `https://bru-2.zeebe.camunda.io/<cluster-id>`).
+3. Open **API / Client Credentials** (wording can vary slightly by Console version).
+4. Create a client credential if you do not already have one.
+5. Copy the generated values:
+   - **Client ID** -> `CAMUNDA_CLIENT_ID`
+   - **Client Secret** -> `CAMUNDA_CLIENT_SECRET`
+
+Keep `CAMUNDA_CLIENT_SECRET` secure. Camunda usually only shows it once when created.
+
 ## Environment variable setup
 
 ### macOS and Linux
