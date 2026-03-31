@@ -24,7 +24,7 @@ Configuration is defined in `src/main/resources/application.yaml` and can be ove
 
 | Property | Environment variable | Description |
 | --- | --- | --- |
-| `camunda.base-url` | `CAMUNDA_BASE_URL` | Camunda cluster base URL, for example `https://your-camunda-endpoint` |
+| `camunda.base-url` | `CAMUNDA_BASE_URL` | Camunda cluster base URL, for example `https://your-camunda-endpoint` (required, must not be blank) |
 | `camunda.api-path` | `CAMUNDA_API_PATH` | REST API path, defaults to `/v2` |
 | `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | OAuth token endpoint, defaults to `https://login.cloud.camunda.io/oauth/token` |
 | `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | OAuth client id (required, must not be blank) |
@@ -120,6 +120,8 @@ set CAMUNDA_TOKEN_REFRESH_SKEW=PT30S
 ### Alternate option: direnv
 
 This project also includes a single `.envrc` file with the same `CAMUNDA_*` variables used by `application.yaml`.
+
+The committed `.envrc` keeps `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` empty on purpose (you must set them), and provides defaults for `CAMUNDA_API_PATH`, `CAMUNDA_TOKEN_URL`, `CAMUNDA_AUDIENCE`, `CAMUNDA_SCOPE`, and `CAMUNDA_TOKEN_REFRESH_SKEW`.
 
 To load them with `direnv`:
 
