@@ -26,10 +26,10 @@ Configuration is defined in `src/main/resources/application.yaml` and can be ove
 | --- | --- | --- |
 | `camunda.base-url` | `CAMUNDA_BASE_URL` | Camunda cluster base URL, for example `https://your-camunda-endpoint` |
 | `camunda.api-path` | `CAMUNDA_API_PATH` | REST API path, defaults to `/v2` |
-| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | OAuth token endpoint |
+| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | OAuth token endpoint, defaults to `https://login.cloud.camunda.io/oauth/token` |
 | `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | OAuth client id |
 | `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | OAuth client secret |
-| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | Optional audience, commonly `https://api.camunda.io` |
+| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | Audience for OAuth token request, defaults to `zeebe.camunda.io` |
 | `camunda.auth.scope` | `CAMUNDA_SCOPE` | Optional OAuth scope |
 | `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | Token refresh buffer, defaults to `PT30S` |
 
@@ -57,10 +57,10 @@ For the current terminal session:
 ```zsh
 export CAMUNDA_BASE_URL="https://your-camunda-endpoint"
 export CAMUNDA_API_PATH="/v2"
-export CAMUNDA_TOKEN_URL="https://login.camunda.io/oauth/token"
+export CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 export CAMUNDA_CLIENT_ID="your-client-id"
 export CAMUNDA_CLIENT_SECRET="your-client-secret"
-export CAMUNDA_AUDIENCE="https://api.camunda.io"
+export CAMUNDA_AUDIENCE="zeebe.camunda.io"
 export CAMUNDA_SCOPE=""
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
@@ -77,10 +77,10 @@ For the current PowerShell session:
 ```powershell
 $env:CAMUNDA_BASE_URL="https://your-camunda-endpoint"
 $env:CAMUNDA_API_PATH="/v2"
-$env:CAMUNDA_TOKEN_URL="https://login.camunda.io/oauth/token"
+$env:CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 $env:CAMUNDA_CLIENT_ID="your-client-id"
 $env:CAMUNDA_CLIENT_SECRET="your-client-secret"
-$env:CAMUNDA_AUDIENCE="https://api.camunda.io"
+$env:CAMUNDA_AUDIENCE="zeebe.camunda.io"
 $env:CAMUNDA_SCOPE=""
 $env:CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
@@ -90,10 +90,10 @@ To persist them for future sessions, use `setx`:
 ```powershell
 setx CAMUNDA_BASE_URL "https://your-camunda-endpoint"
 setx CAMUNDA_API_PATH "/v2"
-setx CAMUNDA_TOKEN_URL "https://login.camunda.io/oauth/token"
+setx CAMUNDA_TOKEN_URL "https://login.cloud.camunda.io/oauth/token"
 setx CAMUNDA_CLIENT_ID "your-client-id"
 setx CAMUNDA_CLIENT_SECRET "your-client-secret"
-setx CAMUNDA_AUDIENCE "https://api.camunda.io"
+setx CAMUNDA_AUDIENCE "zeebe.camunda.io"
 setx CAMUNDA_SCOPE ""
 setx CAMUNDA_TOKEN_REFRESH_SKEW "PT30S"
 ```
@@ -107,10 +107,10 @@ For the current `cmd.exe` session:
 ```bat
 set CAMUNDA_BASE_URL=https://your-camunda-endpoint
 set CAMUNDA_API_PATH=/v2
-set CAMUNDA_TOKEN_URL=https://login.camunda.io/oauth/token
+set CAMUNDA_TOKEN_URL=https://login.cloud.camunda.io/oauth/token
 set CAMUNDA_CLIENT_ID=your-client-id
 set CAMUNDA_CLIENT_SECRET=your-client-secret
-set CAMUNDA_AUDIENCE=https://api.camunda.io
+set CAMUNDA_AUDIENCE=zeebe.camunda.io
 set CAMUNDA_SCOPE=
 set CAMUNDA_TOKEN_REFRESH_SKEW=PT30S
 ```
@@ -133,10 +133,10 @@ You can then edit `.envrc` directly with your Camunda values.
 ```sh
 export CAMUNDA_BASE_URL="https://your-camunda-endpoint"
 export CAMUNDA_API_PATH="/v2"
-export CAMUNDA_TOKEN_URL="https://login.camunda.io/oauth/token"
+export CAMUNDA_TOKEN_URL="https://login.cloud.camunda.io/oauth/token"
 export CAMUNDA_CLIENT_ID="your-client-id"
 export CAMUNDA_CLIENT_SECRET="your-client-secret"
-export CAMUNDA_AUDIENCE="https://api.camunda.io"
+export CAMUNDA_AUDIENCE="zeebe.camunda.io"
 export CAMUNDA_SCOPE=""
 export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ```
