@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: Spring-Http-Camunda-Client
+
+camunda:
+  base-url: ${CAMUNDA_BASE_URL:http://localhost:8080}
+  api-path: ${CAMUNDA_API_PATH:/v2}
+  auth:
+    token-url: ${CAMUNDA_TOKEN_URL:}
+    client-id: ${CAMUNDA_CLIENT_ID:}
+    client-secret: ${CAMUNDA_CLIENT_SECRET:}
+    audience: ${CAMUNDA_AUDIENCE:}
+    scope: ${CAMUNDA_SCOPE:}
+    refresh-skew: ${CAMUNDA_TOKEN_REFRESH_SKEW:PT30S}
+
