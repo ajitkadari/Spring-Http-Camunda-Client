@@ -23,8 +23,8 @@ final class CamundaTestSupport {
                         TOKEN_URL,
                         "test-client",
                         "test-secret",
-                        "https://api.camunda.io",
-                        "",
+                        "zeebe.camunda.io",
+                        "Zeebe",
                         Duration.ofSeconds(30)));
     }
 

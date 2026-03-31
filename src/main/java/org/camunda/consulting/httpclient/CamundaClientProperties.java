@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +21,8 @@ public record CamundaClientProperties(
             @NotBlank String clientId,
             @NotBlank String clientSecret,
             @NotBlank String audience,
-            @DefaultValue("") String scope,
+            @Pattern(regexp = "Zeebe|Tasklist|Operate", message = "scope must be one of: Zeebe, Tasklist, Operate")
+            @NotBlank String scope,
             @DefaultValue("PT30S") Duration refreshSkew) {
     }
 }

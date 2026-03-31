@@ -8,7 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
         "camunda.auth.token-url=https://login.cloud.camunda.io/oauth/token",
         "camunda.auth.client-id=test-client-id",
         "camunda.auth.client-secret=test-client-secret",
-        "camunda.auth.audience=zeebe.camunda.io"
+        "camunda.auth.audience=zeebe.camunda.io",
+        "camunda.auth.scope=Zeebe"
 })
 class CamundaClientApplicationTests {
 
