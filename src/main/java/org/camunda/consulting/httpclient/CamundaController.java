@@ -2,6 +2,7 @@ package org.camunda.consulting.httpclient;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestClient;
 @RequestMapping("/api/camunda")
 public class CamundaController {
 
+    @Autowired
     private final RestClient camundaApiRestClient;
 
     public CamundaController(RestClient camundaApiRestClient) {
