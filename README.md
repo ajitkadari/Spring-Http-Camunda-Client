@@ -95,23 +95,23 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 
 ### Environment Variables
 
-| Property | Environment variable | Required | Default | Notes |
-| --- | --- |----------| --- | --- |
-| `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes      | None | Must not be blank |
-| `camunda.api-path` | `CAMUNDA_API_PATH` | No       | `/v2` | API prefix |
-| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | Yes      | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint |
-| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes      | None | Must not be blank |
-| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes      | None | Must not be blank |
-| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No       | `zeebe.camunda.io` | OAuth audience |
-| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate` |
-| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No       | `PT30S` | ISO-8601 duration |
+| Property | Environment variable | Required | Default | Notes                                                                            |
+| --- | --- |----------| --- |----------------------------------------------------------------------------------|
+| `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes      | None | Value of environment variable, ZEEBE_REST_ADDRESS, obtained from Camunda Console |
+| `camunda.api-path` | `CAMUNDA_API_PATH` | No       | `/v2` | API prefix                                                                       |
+| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | Yes      | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint                                                             |
+| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes      | None | Must not be blank                                                                |
+| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes      | None | Must not be blank                                                                |
+| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No       | `zeebe.camunda.io` | OAuth audience                                                                   |
+| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate`                                          |
+| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No       | `PT30S` | ISO-8601 duration                                                                |
 
 `camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` are validated as non-blank at startup.
 
 ### Get Required Values from Camunda 8 SaaS
 
 1. Sign in to Camunda Console.
-2. Open your cluster and copy the REST endpoint host for `CAMUNDA_BASE_URL`.
+2. Open your cluster and copy the REST endpoint host from the environment variable for `ZEEBE_REST_ADDRESS`.
 3. Open **API / Client Credentials**.
 4. Create or open an M2M credential.
 5. Copy:
@@ -122,7 +122,7 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 
 Ensure outbound access from your environment to:
 
-- your `CAMUNDA_BASE_URL` from Camunda Console. Example: `https://<CAMUNDA_CLUSTER_REGION>.zeebe.camunda.io/<CAMUNDA_CLUSTER_ID>`
+- `ZEEBE_REST_ADDRESS` environment variable obtained from Camunda Console. Format will be: `https://<CAMUNDA_CLUSTER_REGION>.zeebe.camunda.io/<CAMUNDA_CLUSTER_ID>`
 - `https://login.cloud.camunda.io/oauth/token`
 
 ### Setting Environment Variables
