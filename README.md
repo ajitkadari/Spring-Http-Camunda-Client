@@ -96,15 +96,15 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 ### Environment Variables
 
 | Property | Environment variable | Required | Default | Notes |
-| --- | --- | --- | --- | --- |
-| `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes | None | Must not be blank |
-| `camunda.api-path` | `CAMUNDA_API_PATH` | No | `/v2` | API prefix |
-| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | No | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint |
-| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes | None | Must not be blank |
-| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes | None | Must not be blank |
-| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No | `zeebe.camunda.io` | OAuth audience |
-| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate` |
-| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No | `PT30S` | ISO-8601 duration |
+| --- | --- |----------| --- | --- |
+| `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes      | None | Must not be blank |
+| `camunda.api-path` | `CAMUNDA_API_PATH` | No       | `/v2` | API prefix |
+| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | Yes      | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint |
+| `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes      | None | Must not be blank |
+| `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes      | None | Must not be blank |
+| `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No       | `zeebe.camunda.io` | OAuth audience |
+| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate` |
+| `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No       | `PT30S` | ISO-8601 duration |
 
 `camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` are validated as non-blank at startup.
 
@@ -122,7 +122,7 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 
 Ensure outbound access from your environment to:
 
-- your configured `CAMUNDA_BASE_URL`
+- your `CAMUNDA_BASE_URL` from Camunda Console. Example: `https://<CAMUNDA_CLUSTER_REGION>.zeebe.camunda.io/<CAMUNDA_CLUSTER_ID>`
 - `https://login.cloud.camunda.io/oauth/token`
 
 ### Setting Environment Variables
