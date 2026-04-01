@@ -1,8 +1,8 @@
 # Spring HTTP Camunda Client
 
-A Spring Boot client application that calls Camunda 8 SaaS REST endpoints using OAuth client credentials.
-
 **Last Updated:** April 2026
+
+A Spring Boot client application that calls Camunda 8 SaaS REST endpoints using OAuth client credentials.
 
 ---
 
@@ -276,8 +276,3 @@ After starting the app, OpenAPI/Swagger is available at:
   - Ensure `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` are set and non-blank.
 - OAuth/token request failures
   - Verify `CAMUNDA_TOKEN_URL`, `CAMUNDA_AUDIENCE`, and network connectivity to Camunda SaaS endpoints.
-
-
-
-
-
