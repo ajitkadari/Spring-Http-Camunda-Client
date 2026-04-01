@@ -46,12 +46,12 @@ This project provides a minimal, production-style example of:
 | Technology | Version |
 | --- | --- |
 | Java | 25 |
-| Spring Boot | 4.0.4 |
+| Spring Boot | 4.0.5 |
 | Spring Web MVC | via `spring-boot-starter-webmvc` |
 | Spring RestClient | via `spring-boot-starter-restclient` |
 | Bean Validation | via `spring-boot-starter-validation` |
-| OpenAPI + Swagger UI | via `springdoc-openapi-starter-webmvc-ui` |
-| Maven | 3.x (via wrapper `mvnw`) |
+| OpenAPI + Swagger UI | `springdoc-openapi-starter-webmvc-ui:3.0.2` |
+| Maven | 3.9.14 (via wrapper `mvnw`) |
 
 ---
 
