@@ -2,7 +2,8 @@ package org.camunda.consulting.httpclient;
 
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,9 +12,9 @@ import org.springframework.web.client.RestClient;
 
 @RestController
 @RequestMapping("/api/camunda")
+@Tag(name = "Camunda", description = "Camunda API proxy endpoints")
 public class CamundaController {
 
-    @Autowired
     private final RestClient camundaApiRestClient;
 
     public CamundaController(RestClient camundaApiRestClient) {
@@ -21,6 +22,7 @@ public class CamundaController {
     }
 
     @GetMapping(path = "/topology", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get Camunda topology", description = "Returns topology payload from the configured Camunda base URL")
     public String topology() {
         String response = this.camundaApiRestClient.get()
                 .uri("/topology")

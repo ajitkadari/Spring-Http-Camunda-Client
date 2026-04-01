@@ -22,6 +22,7 @@ A Spring Boot client application that calls Camunda 8 SaaS REST endpoints using 
 - [Request Flow](#request-flow)
 - [Running the Application](#running-the-application)
 - [API Endpoint](#api-endpoint)
+- [API Documentation](#api-documentation)
 - [Running Tests](#running-tests)
 - [Building a JAR](#building-a-jar)
 - [Troubleshooting](#troubleshooting)
@@ -49,6 +50,7 @@ This project provides a minimal, production-style example of:
 | Spring Web MVC | via `spring-boot-starter-webmvc` |
 | Spring RestClient | via `spring-boot-starter-restclient` |
 | Bean Validation | via `spring-boot-starter-validation` |
+| OpenAPI + Swagger UI | via `springdoc-openapi-starter-webmvc-ui` |
 | Maven | 3.x (via wrapper `mvnw`) |
 
 ---
@@ -62,6 +64,7 @@ src/
 │   │   ├── CamundaClientApplication.java        # Spring Boot entry point
 │   │   ├── CamundaClientConfig.java             # RestClient and token provider wiring
 │   │   ├── CamundaClientProperties.java         # Configuration properties + validation
+│   │   ├── OpenApiConfig.java                   # OpenAPI metadata configuration
 │   │   ├── TokenProvider.java                   # Token abstraction
 │   │   ├── ClientCredentialsTokenProvider.java  # OAuth client credentials token flow
 │   │   └── CamundaController.java               # GET /api/camunda/topology endpoint
@@ -233,6 +236,15 @@ Quick check:
 ```zsh
 curl http://localhost:8080/api/camunda/topology
 ```
+
+---
+
+## API Documentation
+
+After starting the app, OpenAPI/Swagger is available at:
+
+- `Swagger UI`: `http://localhost:8080/swagger-ui/index.html`
+- `OpenAPI JSON`: `http://localhost:8080/v3/api-docs`
 
 ---
 
