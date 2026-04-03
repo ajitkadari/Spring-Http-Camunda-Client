@@ -34,6 +34,46 @@ class CamundaRestClientTest {
         assertEquals(CamundaTestSupport.TOPOLOGY_RESPONSE, response);
         server.verify();
     }
+
+    @Test
+    void addsBearerTokenAndSearchesDecisionDefinitions() {
+        TokenProvider tokenProvider = () -> CamundaTestSupport.TEST_TOKEN;
+
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        RestClient restClient = CamundaTestSupport.apiRestClient(builder, tokenProvider);
+        CamundaService camundaService = new CamundaService(restClient);
+
+        server.expect(requestTo(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + CamundaTestSupport.TEST_TOKEN))
+                .andRespond(withSuccess(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_RESPONSE, MediaType.APPLICATION_JSON));
+
+        String response = camundaService.searchDecisionDefinitions(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_REQUEST);
+
+        assertEquals(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_RESPONSE, response);
+        server.verify();
+    }
+
+    @Test
+    void addsBearerTokenAndEvaluatesDecisionDefinition() {
+        TokenProvider tokenProvider = () -> CamundaTestSupport.TEST_TOKEN;
+
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        RestClient restClient = CamundaTestSupport.apiRestClient(builder, tokenProvider);
+        CamundaService camundaService = new CamundaService(restClient);
+
+        server.expect(requestTo(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + CamundaTestSupport.TEST_TOKEN))
+                .andRespond(withSuccess(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_RESPONSE, MediaType.APPLICATION_JSON));
+
+        String response = camundaService.evaluateDecisionDefinition(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_REQUEST);
+
+        assertEquals(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_RESPONSE, response);
+        server.verify();
+    }
 }
 
 

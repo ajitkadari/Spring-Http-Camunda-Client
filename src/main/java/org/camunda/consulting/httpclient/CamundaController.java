@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +25,34 @@ public class CamundaController {
     @Operation(summary = "Get Camunda Cluster topology", description = "Returns Camunda Cluster topology payload from the configured Camunda base URL")
     public String topology() {
         return this.camundaService.topology();
+    }
+
+    @GetMapping(path = "/decision-definitions/{decisionDefinitionKey}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get a decision definition", description = "Returns a Camunda decision definition by its key")
+    public String getDecisionDefinition(@PathVariable long decisionDefinitionKey) {
+        return this.camundaService.getDecisionDefinition(decisionDefinitionKey);
+    }
+
+    @GetMapping(path = "/decision-definitions/{decisionDefinitionKey}/xml", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get decision definition XML", description = "Returns the XML representation of a Camunda decision definition by its key")
+    public String getDecisionDefinitionXml(@PathVariable long decisionDefinitionKey) {
+        return this.camundaService.getDecisionDefinitionXml(decisionDefinitionKey);
+    }
+
+    @PostMapping(path = "/decision-definitions/search",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Search decision definitions", description = "Searches Camunda decision definitions using the provided filter criteria")
+    public String searchDecisionDefinitions(@RequestBody String requestBody) {
+        return this.camundaService.searchDecisionDefinitions(requestBody);
+    }
+
+    @PostMapping(path = "/decision-definitions/evaluation",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Evaluate a decision definition", description = "Evaluates a Camunda decision definition using the provided input variables")
+    public String evaluateDecisionDefinition(@RequestBody String requestBody) {
+        return this.camundaService.evaluateDecisionDefinition(requestBody);
     }
 }
 

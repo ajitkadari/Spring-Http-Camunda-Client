@@ -23,7 +23,7 @@ A Spring Boot client application that calls Camunda 8 SaaS REST endpoints using 
   - [Using direnv (Alternative)](#using-direnv-alternative)
 - [Request Flow](#request-flow)
 - [Running the Application](#running-the-application)
-- [API Endpoint](#api-endpoint)
+- [API Endpoints](#api-endpoints)
 - [API Documentation](#api-documentation)
 - [Running Tests](#running-tests)
 - [Building a JAR](#building-a-jar)
@@ -38,8 +38,13 @@ This project provides a minimal, production-style example of:
 - configuring a Spring `RestClient` for Camunda API calls
 - loading Camunda settings from `camunda.*` properties
 - obtaining and caching OAuth access tokens with a `TokenProvider`
-- exposing `GET /api/camunda/topology` locally
-- forwarding requests to `{camunda.base-url}{camunda.api-path}/topology`
+- exposing the following local proxy endpoints:
+  - `GET  /api/camunda/topology`
+  - `GET  /api/camunda/decision-definitions/{decisionDefinitionKey}`
+  - `GET  /api/camunda/decision-definitions/{decisionDefinitionKey}/xml`
+  - `POST /api/camunda/decision-definitions/search`
+  - `POST /api/camunda/decision-definitions/evaluation`
+- forwarding each request to the equivalent Camunda 8 SaaS REST endpoint
 
 ---
 
@@ -213,9 +218,9 @@ export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 
 ## Request Flow
 
-1. Call `GET /api/camunda/topology`.
+1. Call one of the local proxy endpoints (e.g. `GET /api/camunda/topology`).
 2. `CamundaController` delegates to `CamundaService`.
-3. `CamundaService` invokes the Camunda `RestClient`.
+3. `CamundaService` invokes the Camunda `RestClient` with the appropriate HTTP method and path.
 4. The request interceptor asks `TokenProvider` for a token.
 5. `ClientCredentialsTokenProvider` fetches or reuses a cached token.
 6. Request is sent with `Authorization: Bearer <token>`.
@@ -230,19 +235,40 @@ export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 
 ---
 
-## API Endpoint
+## API Endpoints
 
-Local endpoint:
-
-- `GET http://localhost:8080/api/camunda/topology`
+| Method | Local URL | Camunda SaaS path |
+| --- | --- | --- |
+| `GET` | `http://localhost:8080/api/camunda/topology` | `/v2/topology` |
+| `GET` | `http://localhost:8080/api/camunda/decision-definitions/{decisionDefinitionKey}` | `/v2/decision-definitions/{decisionDefinitionKey}` |
+| `GET` | `http://localhost:8080/api/camunda/decision-definitions/{decisionDefinitionKey}/xml` | `/v2/decision-definitions/{decisionDefinitionKey}/xml` |
+| `POST` | `http://localhost:8080/api/camunda/decision-definitions/search` | `/v2/decision-definitions/search` |
+| `POST` | `http://localhost:8080/api/camunda/decision-definitions/evaluation` | `/v2/decision-definitions/evaluation` |
 
 Quick check:
 
 ```zsh
+# Topology
 curl http://localhost:8080/api/camunda/topology
+
+# Get a decision definition by key
+curl http://localhost:8080/api/camunda/decision-definitions/2251799813685249
+
+# Get decision definition XML by key
+curl http://localhost:8080/api/camunda/decision-definitions/2251799813685249/xml
+
+# Search decision definitions
+curl -X POST http://localhost:8080/api/camunda/decision-definitions/search \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Evaluate a decision definition
+curl -X POST http://localhost:8080/api/camunda/decision-definitions/evaluation \
+  -H "Content-Type: application/json" \
+  -d '{"decisionDefinitionKey": "<key>", "variables": {}}'
 ```
 
-This endpoint delegates to `CamundaService`, which calls the configured Camunda Cluster `/topology` endpoint by using the shared Camunda `RestClient` bean.
+Each endpoint delegates to `CamundaService`, which calls the configured Camunda SaaS REST endpoint using the shared `RestClient` bean.
 
 ---
 
