@@ -66,10 +66,11 @@ src/
 │   │   ├── CamundaClientApplication.java        # Spring Boot entry point
 │   │   ├── CamundaClientConfig.java             # RestClient and token provider wiring
 │   │   ├── CamundaClientProperties.java         # Configuration properties + validation
+│   │   ├── CamundaService.java                  # Camunda API service using RestClient
 │   │   ├── OpenApiConfig.java                   # OpenAPI metadata configuration
 │   │   ├── TokenProvider.java                   # Token abstraction
 │   │   ├── ClientCredentialsTokenProvider.java  # OAuth client credentials token flow
-│   │   └── CamundaController.java               # GET /api/camunda/topology endpoint
+│   │   └── CamundaController.java               # HTTP endpoint delegating to CamundaService
 │   └── resources/
 │       └── application.yaml                     # Env-backed configuration defaults
 └── test/
@@ -101,22 +102,23 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 | --- | --- |----------| --- |----------------------------------------------------------------------------------|
 | `camunda.base-url` | `CAMUNDA_BASE_URL` | Yes      | None | Value of environment variable, ZEEBE_REST_ADDRESS, obtained from Camunda Console |
 | `camunda.api-path` | `CAMUNDA_API_PATH` | No       | `/v2` | API prefix                                                                       |
-| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | Yes      | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint                                                             |
+| `camunda.auth.token-url` | `CAMUNDA_TOKEN_URL` | No       | `https://login.cloud.camunda.io/oauth/token` | OAuth token endpoint                                                             |
 | `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes      | None | Must not be blank                                                                |
 | `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes      | None | Must not be blank                                                                |
 | `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No       | `zeebe.camunda.io` | OAuth audience                                                                   |
 | `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate`                                          |
 | `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No       | `PT30S` | ISO-8601 duration                                                                |
 
-`camunda.base-url`, `camunda.auth.client-id`, and `camunda.auth.client-secret` are validated as non-blank at startup.
+`camunda.base-url`, `camunda.auth.token-url`, `camunda.auth.client-id`, `camunda.auth.client-secret`, `camunda.auth.audience`, and `camunda.auth.scope` are validated as non-blank at startup. `camunda.auth.token-url`, `camunda.auth.audience`, and `camunda.auth.scope` have defaults from `application.yaml` unless you override them.
 
 ### Get Required Values from Camunda 8 SaaS
 
 1. Sign in to Camunda Console.
-2. Open your cluster and copy the REST endpoint host from the environment variable for `ZEEBE_REST_ADDRESS`.
+2. Open your cluster and copy the REST endpoint from `ZEEBE_REST_ADDRESS` for `CAMUNDA_BASE_URL`.
 3. Open **API / Client Credentials**.
 4. Create or open an M2M credential.
 5. Copy:
+   - `CAMUNDA_BASE_URL` from `ZEEBE_REST_ADDRESS`
    - `CAMUNDA_CLIENT_ID`
    - `CAMUNDA_CLIENT_SECRET`
 
@@ -212,10 +214,11 @@ export CAMUNDA_TOKEN_REFRESH_SKEW="PT30S"
 ## Request Flow
 
 1. Call `GET /api/camunda/topology`.
-2. `CamundaController` invokes the Camunda `RestClient`.
-3. The request interceptor asks `TokenProvider` for a token.
-4. `ClientCredentialsTokenProvider` fetches or reuses a cached token.
-5. Request is sent with `Authorization: Bearer <token>`.
+2. `CamundaController` delegates to `CamundaService`.
+3. `CamundaService` invokes the Camunda `RestClient`.
+4. The request interceptor asks `TokenProvider` for a token.
+5. `ClientCredentialsTokenProvider` fetches or reuses a cached token.
+6. Request is sent with `Authorization: Bearer <token>`.
 
 ---
 
@@ -238,6 +241,8 @@ Quick check:
 ```zsh
 curl http://localhost:8080/api/camunda/topology
 ```
+
+This endpoint delegates to `CamundaService`, which calls the configured Camunda Cluster `/topology` endpoint by using the shared Camunda `RestClient` bean.
 
 ---
 
@@ -268,10 +273,14 @@ After starting the app, OpenAPI/Swagger is available at:
 
 ## Troubleshooting
 
+- `camunda.base-url must not be blank`
+  - Set `CAMUNDA_BASE_URL` to your Camunda 8 SaaS cluster REST endpoint (`ZEEBE_REST_ADDRESS`).
 - `camunda.auth.client-id must be configured` or `camunda.auth.client-secret must be configured`
   - Set non-empty values for `CAMUNDA_CLIENT_ID` and `CAMUNDA_CLIENT_SECRET`.
 - `camunda.auth.scope` validation fails
   - Use one of: `Zeebe`, `Tasklist`, `Operate`.
+- `camunda.auth.token-url`, `camunda.auth.audience`, or `camunda.auth.scope` must not be blank
+  - Remove the blank override or provide a non-empty value. If not overridden, the defaults from `application.yaml` are used.
 - Startup binding failures for required properties
   - Ensure `CAMUNDA_BASE_URL`, `CAMUNDA_CLIENT_ID`, and `CAMUNDA_CLIENT_SECRET` are set and non-blank.
 - OAuth/token request failures

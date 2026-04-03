@@ -22,16 +22,14 @@ class CamundaRestClientTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         RestClient restClient = CamundaTestSupport.apiRestClient(builder, tokenProvider);
+        CamundaService camundaService = new CamundaService(restClient);
 
         server.expect(requestTo(CamundaTestSupport.TOPOLOGY_URL))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + CamundaTestSupport.TEST_TOKEN))
                 .andRespond(withSuccess(CamundaTestSupport.TOPOLOGY_RESPONSE, MediaType.APPLICATION_JSON));
 
-        String response = restClient.get()
-                .uri("/topology")
-                .retrieve()
-                .body(String.class);
+        String response = camundaService.topology();
 
         assertEquals(CamundaTestSupport.TOPOLOGY_RESPONSE, response);
         server.verify();
