@@ -111,7 +111,7 @@ Configuration is defined in `src/main/resources/application.yaml` and is environ
 | `camunda.auth.client-id` | `CAMUNDA_CLIENT_ID` | Yes      | None | Must not be blank                                                                |
 | `camunda.auth.client-secret` | `CAMUNDA_CLIENT_SECRET` | Yes      | None | Must not be blank                                                                |
 | `camunda.auth.audience` | `CAMUNDA_AUDIENCE` | No       | `zeebe.camunda.io` | OAuth audience                                                                   |
-| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Allowed: `Zeebe`, `Tasklist`, `Operate`                                          |
+| `camunda.auth.scope` | `CAMUNDA_SCOPE` | No       | `Zeebe` | Must be one of: `Zeebe`, `Tasklist`, `Operate`. Validated at startup.            |
 | `camunda.auth.refresh-skew` | `CAMUNDA_TOKEN_REFRESH_SKEW` | No       | `PT30S` | ISO-8601 duration                                                                |
 
 `camunda.base-url`, `camunda.auth.token-url`, `camunda.auth.client-id`, `camunda.auth.client-secret`, `camunda.auth.audience`, and `camunda.auth.scope` are validated as non-blank at startup. `camunda.auth.token-url`, `camunda.auth.audience`, and `camunda.auth.scope` have defaults from `application.yaml` unless you override them.
@@ -257,15 +257,23 @@ curl http://localhost:8080/api/camunda/decision-definitions/2251799813685249
 # Get decision definition XML by key
 curl http://localhost:8080/api/camunda/decision-definitions/2251799813685249/xml
 
-# Search decision definitions
+# Search decision definitions (with pagination, sort, and optional filter)
 curl -X POST http://localhost:8080/api/camunda/decision-definitions/search \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "page": { "from": 0, "limit": 100 },
+    "sort": [{ "field": "decisionDefinitionKey", "order": "ASC" }]
+  }'
 
-# Evaluate a decision definition
+# Evaluate a decision definition — option 1: by decisionDefinitionId
 curl -X POST http://localhost:8080/api/camunda/decision-definitions/evaluation \
   -H "Content-Type: application/json" \
-  -d '{"decisionDefinitionKey": "<key>", "variables": {}}'
+  -d '{"decisionDefinitionId": "1234-5678", "variables": {}}'
+
+# Evaluate a decision definition — option 2: by decisionDefinitionKey
+curl -X POST http://localhost:8080/api/camunda/decision-definitions/evaluation \
+  -H "Content-Type: application/json" \
+  -d '{"decisionDefinitionKey": "12345", "variables": {}}'
 ```
 
 Each endpoint delegates to `CamundaService`, which calls the configured Camunda SaaS REST endpoint using the shared `RestClient` bean.

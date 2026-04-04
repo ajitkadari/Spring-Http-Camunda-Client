@@ -39,7 +39,7 @@ public class CamundaService {
         return Objects.requireNonNull(response, "Camunda decision-definitions/" + decisionDefinitionKey + "/xml response must not be null");
     }
 
-    public String searchDecisionDefinitions(String requestBody) {
+    public String searchDecisionDefinitions(Object requestBody) {
         String response = this.camundaApiRestClient.post()
                 .uri("/decision-definitions/search")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +49,7 @@ public class CamundaService {
         return Objects.requireNonNull(response, "Camunda decision-definitions/search response must not be null");
     }
 
-    public String evaluateDecisionDefinition(String requestBody) {
+    public String evaluateDecisionDefinition(Object requestBody) {
         String response = this.camundaApiRestClient.post()
                 .uri("/decision-definitions/evaluation")
                 .contentType(MediaType.APPLICATION_JSON)

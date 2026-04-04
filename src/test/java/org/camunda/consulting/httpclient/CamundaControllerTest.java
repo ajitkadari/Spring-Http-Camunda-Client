@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,7 +32,7 @@ class CamundaControllerTest {
     @Test
     void exposesDecisionDefinitionsSearchEndpoint() throws Exception {
         CamundaService camundaService = mock(CamundaService.class);
-        when(camundaService.searchDecisionDefinitions(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_REQUEST))
+        when(camundaService.searchDecisionDefinitions(any()))
                 .thenReturn(CamundaTestSupport.DECISION_DEFINITIONS_SEARCH_RESPONSE);
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(
@@ -48,7 +49,7 @@ class CamundaControllerTest {
     @Test
     void exposesDecisionDefinitionsEvaluationEndpoint() throws Exception {
         CamundaService camundaService = mock(CamundaService.class);
-        when(camundaService.evaluateDecisionDefinition(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_REQUEST))
+        when(camundaService.evaluateDecisionDefinition(any()))
                 .thenReturn(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_RESPONSE);
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(
@@ -62,7 +63,3 @@ class CamundaControllerTest {
                 .andExpect(content().json(CamundaTestSupport.DECISION_DEFINITIONS_EVALUATION_RESPONSE));
     }
 }
-
-
-
-

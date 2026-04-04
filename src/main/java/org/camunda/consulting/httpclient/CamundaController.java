@@ -1,6 +1,9 @@
 package org.camunda.consulting.httpclient;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +46,41 @@ public class CamundaController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Search decision definitions", description = "Searches Camunda decision definitions using the provided filter criteria")
-    public String searchDecisionDefinitions(@RequestBody String requestBody) {
+    public String searchDecisionDefinitions(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(type = "object"),
+                            examples = @ExampleObject(
+                                    name = "DecisionDefinitionSearchRequest",
+                                    value = """
+                                            {
+                                              \"page\": {
+                                                \"from\": 0,
+                                                \"limit\": 100
+                                              },
+                                              \"sort\": [
+                                                {
+                                                  \"field\": \"decisionDefinitionKey\",
+                                                  \"order\": \"ASC\"
+                                                }
+                                              ],
+                                              \"filter\": {
+                                                \"decisionDefinitionId\": \"new-hire-onboarding-workflow\",
+                                                \"name\": \"string\",
+                                                \"version\": 0,
+                                                \"decisionRequirementsId\": \"string\",
+                                                \"tenantId\": \"customer-service\",
+                                                \"decisionDefinitionKey\": \"2251799813326547\",
+                                                \"decisionRequirementsKey\": \"2251799813683346\"
+                                              }
+                                            }
+                                            """
+                            )
+                    )
+            )
+            @RequestBody Object requestBody) {
         return this.camundaService.searchDecisionDefinitions(requestBody);
     }
 
@@ -51,10 +88,35 @@ public class CamundaController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Evaluate a decision definition", description = "Evaluates a Camunda decision definition using the provided input variables")
-    public String evaluateDecisionDefinition(@RequestBody String requestBody) {
+    public String evaluateDecisionDefinition(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(type = "object"),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Evaluate using decisionDefinitionId",
+                                            value = """
+                                                    {
+                                                      "decisionDefinitionId": "1234-5678",
+                                                      "variables": {}
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Evaluate using decisionDefinitionKey",
+                                            value = """
+                                                    {
+                                                      "decisionDefinitionKey": "12345",
+                                                      "variables": {}
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+            @RequestBody Object requestBody) {
         return this.camundaService.evaluateDecisionDefinition(requestBody);
     }
 }
-
-
-
